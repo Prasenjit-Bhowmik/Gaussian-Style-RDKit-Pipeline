@@ -1,4 +1,4 @@
 rdkit-pypi
 pandas
 mordred
-gradio
+gradio>=3.43.0
