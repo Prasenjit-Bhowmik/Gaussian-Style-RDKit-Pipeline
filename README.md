@@ -16,7 +16,7 @@ A reproducible, browser-based cheminformatics pipeline for generating 2D/3D mole
 3. Click **Run Pipeline**
 4. Download results ZIP
 
-[![Launch Binder](https://mybinder.org/badge_logo.svg)](YOUR_BINDER_LINK_HERE)
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Prasenjit-Bhowmik/Gaussian-Style-RDKit-Pipeline.git/main?urlpath=%2Fdoc%2Ftree%2Fpp.py)
 
 ## Example input
 See `examples/example.smi`
