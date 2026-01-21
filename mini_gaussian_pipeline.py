@@ -138,38 +138,7 @@ print(f"✅ Physicochemical properties saved: {prop_csv}")
 print("✅ Pipeline completed: 2D MOLs, 3D MOLs, descriptors, energies, properties")
 print("All outputs saved in the 'smiles/' folder. Run on any folder of .smi files with one command.")
 
-# -----------------------------
-# Stage 7: Cloud / HPC QM (xTB or ORCA) optional
-# -----------------------------
-print("\n🔬 Cloud/HPC QM stage starting...")
 
-if not xtb_available():
-    print("⚠ xTB not available in this environment. Skipping xTB optimization.")
-else:
-    print("✅ xTB found. Running GFN2-xTB optimizations for all molecules...")
-    for name in names:
-        sname = safe_name(name)
-        xtb_dir = smiles_dir / "qm_xtb"
-        work = xtb_dir / sname
-        work.mkdir(parents=True, exist_ok=True)
-
-        molfile = mol3d_dir / f"{name}_lowest.mol"
-        cmd = f'xtb "{molfile}" --gfn 2 --opt > xtb.out'
-        os.system(f'cd "{work}" && {cmd}')
-
-    print("✅ xTB optimization completed. Output stored in smiles/qm_xtb/")
-
-# Optional ORCA stage
-if orca_available():
-    run_orca = input("Run ORCA DFT on shortlisted molecules? (yes/no): ").strip().lower()
-    if run_orca == "yes":
-        print("✅ ORCA found. Preparing ORCA jobs...")
-        # Here you can add your ORCA input generation and submission logic
-        print("⚠ ORCA execution logic not implemented yet. Add HPC submission code here.")
-else:
-    print("⚠ ORCA not available in this environment. Skipping ORCA stage.")
-
-print("🔬 Cloud/HPC QM stage finished.\n")
 
 
 
