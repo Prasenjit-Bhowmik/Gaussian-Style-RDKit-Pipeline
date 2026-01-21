@@ -1,4 +1,4 @@
 rdkit-pypi
-mordred
 pandas
-numpy
+mordred
+gradio
