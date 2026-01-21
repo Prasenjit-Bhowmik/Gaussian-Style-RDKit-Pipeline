@@ -49,8 +49,8 @@ iface = gr.Interface(
     outputs=gr.File(label="Download results (ZIP)"),
     title="Gaussian-style RDKit Pipeline",
     description="Upload a .smi file or paste SMILES. The pipeline generates 2D/3D structures, descriptors, and physicochemical properties.",
-    allow_flagging="never"
 )
 
 if __name__ == "__main__":
     iface.launch()
+
