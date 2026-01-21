@@ -35,8 +35,8 @@ desc3d_csv = smiles_dir / "all_3D_descriptors.csv"
 prop_csv = smiles_dir / "all_properties.csv"
 
 # Create folders
-mol2d_dir.mkdir(exist_ok=True)
-mol3d_dir.mkdir(exist_ok=True)
+mol2d_dir.mkdir(parents=True, exist_ok=True)
+mol3d_dir.mkdir(parents=True, exist_ok=True)
 
 # -----------------------------
 # Stage 1 + 2 + 3: SMILES → 2D + 3D + lowest-energy
@@ -137,6 +137,7 @@ print(f"✅ Physicochemical properties saved: {prop_csv}")
 # -----------------------------
 print("✅ Pipeline completed: 2D MOLs, 3D MOLs, descriptors, energies, properties")
 print("All outputs saved in the 'smiles/' folder. Run on any folder of .smi files with one command.")
+
 
 
 
