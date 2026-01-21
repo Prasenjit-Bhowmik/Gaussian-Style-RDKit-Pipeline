@@ -1,56 +1,55 @@
 import gradio as gr
+import os
 from pathlib import Path
+from mini_gaussian_pipeline import run_pipeline
 import shutil
-import pandas as pd
-from mini_gaussian_pipeline import mini_gaussian_pipeline  # you wrap your main function
+import zipfile
 
-# Temporary working folder
-WORK_DIR = Path("temp_work")
-WORK_DIR.mkdir(exist_ok=True)
+# Temporary folder for user uploads
+USER_FOLDER = Path("smiles")
+USER_FOLDER.mkdir(parents=True, exist_ok=True)
 
-def run_pipeline(smi_file, smi_text):
-    # Clear previous run
-    if WORK_DIR.exists():
-        shutil.rmtree(WORK_DIR)
-    WORK_DIR.mkdir(exist_ok=True)
+def run_gradio_pipeline(smi_file, smi_text):
+    # Clear previous inputs
+    if USER_FOLDER.exists():
+        shutil.rmtree(USER_FOLDER)
+    USER_FOLDER.mkdir(parents=True, exist_ok=True)
 
-    # Save SMILES input
-    if smi_file:
-        content = smi_file.read().decode("utf-8")
-    elif smi_text:
-        content = smi_text
-    else:
-        return "⚠ No input provided."
+    # Save uploaded file if provided
+    if smi_file is not None:
+        file_path = USER_FOLDER / smi_file.name
+        smi_file.save(file_path)
 
-    smi_path = WORK_DIR / "input.smi"
-    smi_path.write_text(content)
+    # Save pasted text as input.smi if provided
+    if smi_text:
+        file_path = USER_FOLDER / "input.smi"
+        with open(file_path, "w") as f:
+            f.write(smi_text)
 
-    # Run your existing pipeline (Stages 1–6)
-    mini_gaussian_pipeline(str(smi_path), output_dir=str(WORK_DIR))
+    # Run your pipeline
+    run_pipeline(str(USER_FOLDER))
 
-    # Prepare results (ZIP)
-    import zipfile
-    zip_path = WORK_DIR / "results.zip"
+    # Create a zip of all output CSVs
+    zip_path = USER_FOLDER / "results.zip"
     with zipfile.ZipFile(zip_path, 'w') as zipf:
-        for f in WORK_DIR.glob("*.csv"):
-            zipf.write(f, f.name)
-        for f in WORK_DIR.glob("mol_files_2D/*.mol"):
-            zipf.write(f, f"mol_files_2D/{f.name}")
-        for f in WORK_DIR.glob("mol_files_3D/*.mol"):
-            zipf.write(f, f"mol_files_3D/{f.name}")
+        for csv_file in ["all_2D_descriptors.csv", "all_3D_descriptors.csv", "all_properties.csv"]:
+            fpath = USER_FOLDER / csv_file
+            if fpath.exists():
+                zipf.write(fpath, arcname=csv_file)
 
     return zip_path
 
-# Gradio UI
+# Gradio interface
 iface = gr.Interface(
-    fn=run_pipeline,
+    fn=run_gradio_pipeline,
     inputs=[
-        gr.File(label="Upload .smi file", file_types=[".smi"]),
-        gr.Textbox(lines=5, label="Or paste SMILES (one per line)")
+        gr.File(label="Upload .smi file", file_types=['.smi']),
+        gr.Textbox(label="Or paste SMILES here (one per line)")
     ],
     outputs=gr.File(label="Download results (ZIP)"),
     title="Gaussian-style RDKit Pipeline",
-    description="Upload a .smi file or paste SMILES. Generates 2D/3D MOLs, descriptors, energies, and properties."
+    description="Upload a .smi file or paste SMILES. The pipeline generates 2D/3D structures, descriptors, and physicochemical properties.",
+    allow_flagging="never"
 )
 
 if __name__ == "__main__":
